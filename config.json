@@ -1,0 +1,18 @@
+
+
+
+
+{
+	"platform": "MQTT Bridge",
+	"name": "Unique name in the platforms named 'MQTT Bridge'",
+	"debug": true,
+	"accessories": [
+		{
+			"name": "Entrén",
+			"type": "switch"
+		}
+	]
+}
+
+
+

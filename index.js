@@ -10,5 +10,5 @@ module.exports = function(api) {
     Homebridge.PlatformAccessory = api.platformAccessory;
     Homebridge.API = api;
 
-    api.registerPlatform('homebridge-http-request', 'HTTP Request', require('./src/platform.js'));
+    api.registerPlatform('homebridge-mqtt-bridge', 'MQTT Bridge', require('./src/platform.js'));
 };
