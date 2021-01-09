@@ -10,10 +10,11 @@ module.exports = class extends Accessory {
 		var state = true;
 		var service = new Service.Switch(this.name, this.UUID);
 		var characteristic = service.getCharacteristic(Characteristic.On);
+		var mqtt = this.platform.mqtt;
 
-		this.mqtt.subscribe('homey/devices/kontoret/a/onoff', () => {});
-		
-		this.mqtt.on('message', (topic, message) => {
+		mqtt.subscribe('homey/devices/kontoret/a/onoff', () => {});
+
+		mqtt.on('message', (topic, message) => {
 			message = message.toString();
 
 			this.debug(`Topic ${topic} message ${message}`);
