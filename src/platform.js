@@ -4,6 +4,7 @@
 module.exports = class Platform {
 
     constructor(log, config, homebridge) {
+		var mqtt = require('mqtt');
 
         this.config = config;
         this.log = log;
@@ -14,15 +15,10 @@ module.exports = class Platform {
             this.debug('Finished launching.');
 		});
 		
-		var mqtt = require('mqtt');
 
 		this.debug(`Connecting to MQTT broker ${this.config.host}...`);
 		this.mqtt = mqtt.connect(this.config.host, {username:this.config.username, password:this.config.password});
 
-		this.mqtt.on('connect', () => {
-			this.debug(`Connected to MQTT broker ${this.config.host}`);
-		});
-        
     }
 
     accessories(callback) {
@@ -40,7 +36,12 @@ module.exports = class Platform {
 
 			if (Accessory != undefined)
 	            accessories.push(new Accessory({config:config, platform:this, log:this.log, debug:this.debug, homebridge:this.homebridge}));
-        });
+		});
+		
+		this.mqtt.on('connect', () => {
+			this.debug(`Connected to MQTT broker ${this.config.host}`);
+		});
+        
 
 		callback(accessories);
     }
