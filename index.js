@@ -2,6 +2,8 @@
 
 var Homebridge = require('./src/homebridge.js');
 
+require('dotenv').config();
+
 module.exports = function(api) {
 
     Homebridge.Service = api.hap.Service;

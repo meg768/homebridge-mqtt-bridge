@@ -1,12 +1,12 @@
 {
   "name": "homebridge-mqtt-bridge",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "homebridge-mqtt-bridge",
   "main": "index.js",
   "scripts": {
-	"git-commit": "make git-commit",
-	"git-pull": "make git-pull",
-	"goto-github": "make goto-github"	
+    "git-commit": "make git-commit",
+    "git-pull": "make git-pull",
+    "goto-github": "make goto-github"
   },
   "engines": {
     "node": ">=12.0.0",
@@ -22,6 +22,8 @@
     "url": "git+https://github.com/meg768/homebridge-mqtt-bridge.git"
   },
   "dependencies": {
+    "dotenv": "^8.2.0",
+    "mqtt": "^4.2.6",
     "yow": "^1.0.108"
   },
   "author": "meg768",

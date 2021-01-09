@@ -6,6 +6,9 @@
 	"platform": "MQTT Bridge",
 	"name": "Unique name in the platforms named 'MQTT Bridge'",
 	"debug": true,
+	"host" : "mqtt://127.0.0.1",
+	"username": "username",
+	"password": "password",
 	"accessories": [
 		{
 			"name": "Entrén",

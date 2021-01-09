@@ -12,7 +12,13 @@ module.exports = class Platform {
 
         this.homebridge.on('didFinishLaunching', () => {
             this.debug('Finished launching.');
-        });
+		});
+		
+		var mqtt = require('mqtt');
+
+		this.debug(`Connecting to MQTT broker ${this.config.host}`);
+		this.mqtt = mqtt.connect(this.config.host, {username:this.config.username, password:this.config.password});
+
         
     }
 
