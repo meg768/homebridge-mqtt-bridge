@@ -16,9 +16,12 @@ module.exports = class Platform {
 		
 		var mqtt = require('mqtt');
 
-		this.debug(`Connecting to MQTT broker ${this.config.host}`);
+		this.debug(`Connecting to MQTT broker ${this.config.host}...`);
 		this.mqtt = mqtt.connect(this.config.host, {username:this.config.username, password:this.config.password});
 
+		this.mqtt.on('connect', () => {
+			this.debug(`Connected to MQTT broker ${this.config.host}`);
+		});
         
     }
 
