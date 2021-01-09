@@ -11,6 +11,14 @@ module.exports = class extends Accessory {
 		var service = new Service.Switch(this.name, this.UUID);
 		var characteristic = service.getCharacteristic(Characteristic.On);
 
+		this.mqtt.subscribe('homey/devices/kontoret/a/onoff', () => {});
+		
+		this.mqtt.on('message', (topic, message) => {
+			message = message.toString();
+
+			this.debug(`Topic ${topic} message ${message}`);
+		});
+
 		var turnOnOff = (value) => {
 			value = value ? true : false;
 
