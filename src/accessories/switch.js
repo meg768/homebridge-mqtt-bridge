@@ -1,59 +1,54 @@
-
 var {Service, Characteristic} = require('../homebridge.js')
 var Accessory = require('../accessory.js');
 
-
-module.exports = class Switch extends Accessory {
+module.exports = class extends Accessory {
 
     constructor(options) {
 
-        super(options);
- 
-        this.switchState = false;
-        
-        this.addService(new Service.Switch(this.name, this.UUID));
-        this.addCharacteristic(Service.Switch, Characteristic.On, this.getSwitchState.bind(this), this.setSwitchState.bind(this));
-    }
+		super(options);
+		
+		var state = true;
+		var service = new Service.Switch(this.name, this.UUID);
+		var characteristic = service.getCharacteristic(Characteristic.On);
 
-    updateSwitchState(value) {
-        if (value != undefined)
-            this.switchState = value;
+		var turnOnOff = (value) => {
+			value = value ? true : false;
 
-        this.getService(Service.Switch).getCharacteristic(Characteristic.On).updateValue(this.switchState);
-        return Promise.resolve();        
-    }
+			return new Promise((resolve, reject) => {
+	
+				this.debug(`Payload XXX`);
+	
+				Promise.resolve().then(() => {
+					this.debug(`Bounce XXX.`);
+					setTimeout(() => {
+						state = !state;
 
-    getSwitchState() {
-        return this.switchState;
-    }
+						this.debug(`Switch state reset to ${state}.`);
+						characteristic.updateValue(state);
+					}, 2000);	
+					resolve();
+				})
+				.catch((error) => {
+					this.log(error);
+					reject(error);
+				})
+	
+			});
 
-    setSwitchState(value) {
-        value = value ? true : false;
+		};
 
-        return new Promise((resolve, reject) => {
-            Promise.resolve().then(() => {
-                if (this.switchState == value)
-                    return Promise.resolve();
 
-                this.switchState = value;
-                this.debug(`Setting switch "${this.name}" state to "${this.switchState}".`);
-                return this.switchState ? this.turnOn() : this.turnOff();
-            })
-            .then(() => {
-                resolve();
-            })
-            .catch((error) => {
-                reject(error);
-            })
-        });
-    }
+		var setter = (value) => {
+			return turnOnOff(value);
+		};
 
-    turnOn() {
-		return Promise.resolve();
-    }
+		var getter = () => {
+			return Promise.resolve(state);
+		};
+		
+		this.addService(service);
+		this.addCharacteristic(service, Characteristic.On, setter, getter);
 
-    turnOff() {
-        return Promise.resolve();
     }
 
 }
