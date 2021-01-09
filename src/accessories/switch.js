@@ -2,6 +2,7 @@
 var {Service, Characteristic} = require('../homebridge.js')
 var Accessory = require('../accessory.js');
 
+
 module.exports = class Switch extends Accessory {
 
     constructor(options) {
@@ -11,7 +12,7 @@ module.exports = class Switch extends Accessory {
         this.switchState = false;
         
         this.addService(new Service.Switch(this.name, this.UUID));
-        this.enableCharacteristic(Service.Switch, Characteristic.On, this.getSwitchState.bind(this), this.setSwitchState.bind(this));
+        this.addCharacteristic(Service.Switch, Characteristic.On, this.getSwitchState.bind(this), this.setSwitchState.bind(this));
     }
 
     updateSwitchState(value) {
