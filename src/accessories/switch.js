@@ -12,7 +12,9 @@ module.exports = class extends Accessory {
 		var characteristic = service.getCharacteristic(Characteristic.On);
 		var mqtt = this.platform.mqtt;
 
-		var topic = 'homey/devices/kontoret/a/onoff';
+		var topic = this.config.topic;
+
+		this.debug(`Subscribing to topic '${topic}...`)
 
 		mqtt.subscribe(topic, () => {});
 
