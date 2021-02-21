@@ -1,7 +1,5 @@
 
 
-
-
 {
 	"platform": "MQTT Bridge",
 	"name": "Unique name in the platforms named 'MQTT Bridge'",
@@ -10,12 +8,11 @@
 	"username": "username",
 	"password": "password",
 	"accessories": [
-		{
-			"name": "Entrén",
-			"type": "switch"
-		}
+
 	]
 }
+
+
 
 
 

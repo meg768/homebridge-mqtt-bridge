@@ -24,7 +24,10 @@ module.exports = class Platform {
     accessories(callback) {
 		
 		var Accessories = {
-			'switch': require('./accessories/switch.js')
+			'switch': require('./accessories/switch.js'),
+			'lightbulb': require('./accessories/lightbulb.js'),
+			'motion-sensor': require('./accessories/motion-sensor.js'),
+			'temperature-sensor': require('./accessories/temperature-sensor.js')
 		}
 
         var accessories = [];
@@ -35,19 +38,50 @@ module.exports = class Platform {
 			var Accessory = Accessories[config.type];
 
 			if (Accessory != undefined)
-	            accessories.push(new Accessory({config:config, platform:this, log:this.log, debug:this.debug, homebridge:this.homebridge}));
+	            accessories.push(new Accessory({config:config, platform:this}));
 		});
 		
 		this.mqtt.on('connect', () => {
 			this.debug(`Connected to MQTT broker ${this.config.host}`);
+			callback(accessories);
 		});
-        
 
-		callback(accessories);
+		this.mqtt.on('message', (topic, message) => {
+
+			try {
+				var payload = JSON.parse(message.toString());
+
+				accessories.forEach((accessory) => {
+					accessory.emit(topic, payload);
+				});		
+			}
+			catch (error) {
+				this.log(error);
+			}
+		});
+
     }
 
+	subscribe(topic) {
+		this.debug(`Subscribing to topic '${topic}...`);
+		this.mqtt.subscribe(topic);		
+	}
 
-    generateUUID(id) {
+	publish(topics, value) {
+		if (typeof value != 'string')
+			value = JSON.stringify(value);
+
+		if (!(topics instanceof Array)) {
+			topics = [topics]
+		}
+
+		topics.forEach((topic) => {
+			this.debug(`Publishing ${value} to topic '${topic}...`);
+			this.mqtt.publish(topic, value, {retain:true});	
+		});
+	}
+
+	generateUUID(id) {
         return this.homebridge.hap.uuid.generate(id.toString());
     }
 

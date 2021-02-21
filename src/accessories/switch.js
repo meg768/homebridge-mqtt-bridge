@@ -1,71 +1,59 @@
 var {Service, Characteristic} = require('../homebridge.js')
 var Accessory = require('../accessory.js');
 
-module.exports = class extends Accessory {
+module.exports = class Switch extends Accessory {
 
     constructor(options) {
 
+		var {service = Service.Switch, ...options} = options;
+
 		super(options);
 		
-		var state = true;
-		var service = new Service.Switch(this.name, this.UUID);
-		var characteristic = service.getCharacteristic(Characteristic.On);
-		var mqtt = this.platform.mqtt;
-
-		var topic = this.config.topic;
-
-		this.debug(`Subscribing to topic '${topic}...`)
-
-		mqtt.subscribe(topic, () => {});
-
-		mqtt.on('message', (topic, message) => {
-			message = message.toString();
-
-			this.debug(`Topic ${topic} message ${message}`);
-
-			state = eval(message);
-			characteristic.updateValue(state);
-		});
-
-		var turnOnOff = (value) => {
-			value = value ? true : false;
-
-			return new Promise((resolve, reject) => {
-	
-				this.debug(`Payload XXX`);
-	
-				Promise.resolve().then(() => {
-					this.debug(`Bounce XXX.`);
-					setTimeout(() => {
-						state = !state;
-
-						this.debug(`Switch state reset to ${state}.`);
-						characteristic.updateValue(state);
-					}, 2000);	
-					resolve();
-				})
-				.catch((error) => {
-					this.log(error);
-					reject(error);
-				})
-	
-			});
-
-		};
-
-
-		var setter = (value) => {
-			return turnOnOff(value);
-		};
-
-		var getter = () => {
-			return Promise.resolve(state);
-		};
-		
-		this.addService(service);
-		this.addCharacteristic(service, Characteristic.On, setter, getter);
-
+		this.addService(new service(this.name, this.UUID));
+		this.enableOnOff(service);
     }
+
+	enableOnOff(service) {
+
+		var {topic, get:getTopic, set:setTopic} = this.config['onoff'];
+
+		if (topic) {
+			getTopic = setTopic = topic;
+		}
+
+		this.onoff = false;
+
+		var getter = async () => {
+			return this.onoff;
+		}
+
+		var setter = async (value) => {
+			try {
+				this.onoff = value ? true : false;
+
+				if (setTopic) 
+					this.platform.publish(setTopic, this.onoff);
+	
+			}
+			catch (error) {
+				this.log(error);
+			}
+	
+		};
+
+		this.enableCharacteristic(service, Characteristic.On, getter, setter);		
+
+		if (getTopic) {
+			this.on(getTopic, (value) => {
+				this.onoff = value;
+	
+				this.debug(`OnOff:${getTopic}:${this.onoff}`);
+				this.updateCharacteristicValue(service, Characteristic.On, this.onoff);	
+			});				
+
+			this.platform.subscribe(getTopic);
+		}		
+	}
 
 }
 

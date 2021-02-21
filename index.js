@@ -14,3 +14,4 @@ module.exports = function(api) {
 
     api.registerPlatform('homebridge-mqtt-bridge', 'MQTT Bridge', require('./src/platform.js'));
 };
+
