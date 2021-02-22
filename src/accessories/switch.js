@@ -14,46 +14,40 @@ module.exports = class Switch extends Accessory {
     }
 
 	enableOnOff(service) {
+		var config = this.config['onoff'];
+		var characteristic = this.getService(service).getCharacteristic(Characteristic.On);
 
-		var {topic, get:getTopic, set:setTopic} = this.config['onoff'];
+		if (config) {
+			this.onoff = characteristic.getDefaultValue();
 
-		if (topic) {
-			getTopic = setTopic = topic;
-		}
+			characteristic.on('get', (callback) => {
+				callback(null, this.onoff);
+            });
 
-		this.onoff = false;
-
-		var getter = async () => {
-			return this.onoff;
-		}
-
-		var setter = async (value) => {
-			try {
-				this.onoff = value ? true : false;
-
-				if (setTopic) 
-					this.platform.publish(setTopic, this.onoff);
-	
-			}
-			catch (error) {
-				this.log(error);
-			}
-	
-		};
-
-		this.enableCharacteristic(service, Characteristic.On, getter, setter);		
-
-		if (getTopic) {
-			this.on(getTopic, (value) => {
+			characteristic.on('set', (value, callback) => {
 				this.onoff = value;
-	
-				this.debug(`OnOff:${getTopic}:${this.onoff}`);
-				this.updateCharacteristicValue(service, Characteristic.On, this.onoff);	
-			});				
 
-			this.platform.subscribe(getTopic);
-		}		
+				if (config.set)
+					this.platform.publish(config.set, this.onoff);
+
+				callback();
+
+			});
+	
+			if (config.get) {
+				this.on(config.get, (value) => {
+					this.onoff = value;
+					this.debug(`OnOff:${config.get}:${this.onoff}`);
+					characteristic.updateValue(this.onoff);	
+				});				
+	
+				this.platform.subscribe(config.get);
+			}		
+	
+		}
 	}
+
+
 
 }
 

@@ -12,25 +12,28 @@ module.exports = class extends Accessory {
     }
 
 	enableCurrentTemperature(service) {
-		var {topic} = this.config['current-temperature'];
+		var config = this.config['current-temperature'];
+		var characteristic = this.getService(service).getCharacteristic(Characteristic.CurrentTemperature);
 
-		this.currentTemperature = 20;
+		if (config) {
+			this.currentTemperature = characteristic.getDefaultValue();
 
-		var getter = async () => {
-			return this.currentTemperature;
+			characteristic.on('get', (callback) => {
+				callback(null, this.currentTemperature);
+            });
+
+			if (config.get) {
+				this.on(config.get, (value) => {
+					this.currentTemperature = value;
+					this.debug(`CurrentTemperature:${config.get}:${this.currentTemperature}`);
+					characteristic.updateValue(this.currentTemperature);	
+				});			
+				
+				this.platform.subscribe(config.get);	
+			}
+	
 		}
 
-		this.enableCharacteristic(service, Characteristic.CurrentTemperature, getter, undefined);
-
-		if (topic) {
-			this.on(topic, (value) => {
-				this.currentTemperature = value;
-				this.debug(`CurrentTemperature:${topic}:${this.currentTemperature}`);
-				this.updateCharacteristicValue(service, Characteristic.CurrentTemperature, this.currentTemperature);	
-			});			
-			
-			this.platform.subscribe(topic);	
-		}
 	}
 
 

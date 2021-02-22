@@ -13,35 +13,38 @@ module.exports = class MotionSensor extends Accessory {
     }
 
 	enableMotionDetected(service) {
-		var topic = this.config['motion-detected'].topic;
 
-		if (topic) {
-			this.motionDetected = false;
-	
-			var getter = async () => {
-				return this.motionDetected;
-			}
-		
-			var setter = async (value) => {
-				try {
+		var config = this.config['motion-detected'];
+		var characteristic = this.getService(service).getCharacteristic(Characteristic.MotionDetected);
+
+		if (config) {
+			this.motionDetected = characteristic.value;
+
+			characteristic.on('get', (callback) => {
+				callback(null, this.motionDetected);
+            });
+
+			characteristic.on('set', (value, callback) => {
+				this.motionDetected = value;
+
+				if (config.set)
+					this.platform.publish(config.set, this.motionDetected);
+
+				callback();
+
+			});
+
+			if (config.get) {
+				this.on(config.get, (value) => {
 					this.motionDetected = value ? true : false;
-					this.platform.publish(topic, this.motionDetected);
-				}
-				catch (error) {
-					this.log(error);
-				}
-		
+					this.debug(`Motion detected ${config.get}:${this.motionDetected}`);
+					characteristic.updateValue(this.motionDetected);	
+				});			
+				
+				this.platform.subscribe(config.get);
+
 			}
-
-			this.enableCharacteristic(service, Characteristic.MotionDetected, getter, setter);
-
-			this.on(topic, (value) => {
-				this.motionDetected = value ? true : false;
-				this.debug(`Motion detected ${topic}:${this.motionDetected}`);
-				this.updateCharacteristicValue(service, Characteristic.MotionDetected, this.motionDetected);	
-			});			
-			
-			this.platform.subscribe(topic);
+	
 		}
 	}
 

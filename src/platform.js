@@ -27,6 +27,7 @@ module.exports = class Platform {
 			'switch': require('./accessories/switch.js'),
 			'lightbulb': require('./accessories/lightbulb.js'),
 			'motion-sensor': require('./accessories/motion-sensor.js'),
+			'outlet': require('./accessories/outlet.js'),
 			'temperature-sensor': require('./accessories/temperature-sensor.js')
 		}
 
