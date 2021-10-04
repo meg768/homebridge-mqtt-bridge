@@ -12,7 +12,7 @@ module.exports = class Switch extends Accessory {
 		this.addService(new service(this.name, this.UUID));
 		this.enableOnOff(service);
     }
-
+/*
 	enableOnOff(service) {
 		var config = this.config['onoff'];
 		var characteristic = this.getService(service).getCharacteristic(Characteristic.On);
@@ -46,7 +46,7 @@ module.exports = class Switch extends Accessory {
 	
 		}
 	}
-
+*/
 
 
 }

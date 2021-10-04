@@ -6,9 +6,7 @@ class App {
     constructor() {
 		var MQTT = require('mqtt');
 
-		
-
-		this.mqtt = MQTT.connect('mqtt://pi-mqtt', {username:'meg768', password:'potatismos'});
+		this.mqtt = MQTT.connect(process.env.MQTT_HOST, {username:process.env.MQTT_USERNAME, password:process.env.MQTT_PASSWORD});
 
 				
 		this.mqtt.on('connect', () => {
